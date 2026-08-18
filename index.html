@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Een willekeurige Nederlandse woordgrap, rechtstreeks uit Supabase." />
+    <title>Woordgrappen</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="kaart" aria-labelledby="titel">
+      <p class="label">WOORDGRAP VAN HET MOMENT</p>
+      <h1 id="titel">Even lachen.</h1>
+      <div class="scheiding" aria-hidden="true"></div>
+      <p id="grap" class="grap" aria-live="polite">Een verse grap wordt opgehaald…</p>
+      <button id="volgende" type="button" disabled>
+        <span>Nog eentje</span>
+        <span aria-hidden="true">→</span>
+      </button>
+      <p id="status" class="status" role="status"></p>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>

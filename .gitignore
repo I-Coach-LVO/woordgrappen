@@ -1,0 +1,22 @@
+# Lokale configuratie en geheimen
+.env
+.env.*
+!.env.example
+
+# Lokale certificaten en sleutels
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Editor- en systeembestanden
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Afhankelijkheden en tijdelijke uitvoer
+node_modules/
+dist/
+.cache/
+*.log
