@@ -1,7 +1,7 @@
 const SUPABASE_URL = "https://ylskdwvtxuionyuzuyfs.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Xj_RHfxvs358TdjWjqlQwA_PgRhV-6k";
-const SITE_URL = "https://i-coach-lvo.github.io/woordgrappen/";
 const SESSIE_SLEUTEL = "woordgrappen-sessie";
+const INTERN_ACCOUNT_DOMEIN = "accounts.woordgrappen.invalid";
 
 const elementen = {
   grap: document.querySelector("#grap"),
@@ -34,6 +34,18 @@ function basisHeaders() {
 
 function ingelogdeHeaders() {
   return { ...basisHeaders(), Authorization: `Bearer ${sessie.access_token}` };
+}
+
+function normaliseerGebruikersnaam(waarde) {
+  return String(waarde).trim().toLowerCase();
+}
+
+function isGeldigeGebruikersnaam(gebruikersnaam) {
+  return /^[a-z0-9._-]{3,24}$/.test(gebruikersnaam);
+}
+
+function internAccountadres(gebruikersnaam) {
+  return `${gebruikersnaam}@${INTERN_ACCOUNT_DOMEIN}`;
 }
 
 async function leesJson(response) {
@@ -212,10 +224,10 @@ function kiesAuthTab(tab) {
 
 function vertaalAuthFout(error) {
   const bericht = error.message.toLowerCase();
-  if (bericht.includes("invalid login credentials")) return "E-mailadres of wachtwoord klopt niet.";
+  if (bericht.includes("invalid login credentials")) return "Gebruikersnaam of wachtwoord klopt niet.";
+  if (bericht.includes("username already exists")) return "Deze gebruikersnaam is al in gebruik.";
+  if (bericht.includes("invalid username")) return "Gebruik 3–24 kleine letters, cijfers, punten, streepjes of underscores.";
   if (bericht.includes("password")) return "Kies een wachtwoord van minimaal 8 tekens.";
-  if (bericht.includes("email")) return "Controleer het ingevulde e-mailadres.";
-  if (bericht.includes("already registered")) return "Voor dit e-mailadres bestaat al een account.";
   return "Inloggen of registreren lukte niet. Probeer het opnieuw.";
 }
 
@@ -224,11 +236,13 @@ async function verwerkLogin(event) {
   elementen.authStatus.textContent = "Even inloggen…";
   const formulier = new FormData(event.currentTarget);
   try {
+    const gebruikersnaam = normaliseerGebruikersnaam(formulier.get("gebruikersnaam"));
+    if (!isGeldigeGebruikersnaam(gebruikersnaam)) throw new Error("invalid username");
     const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
       method: "POST",
       headers: basisHeaders(),
       body: JSON.stringify({
-        email: formulier.get("email"),
+        email: internAccountadres(gebruikersnaam),
         password: formulier.get("password"),
       }),
     });
@@ -248,28 +262,28 @@ async function verwerkRegistratie(event) {
   elementen.authStatus.textContent = "Account wordt gemaakt…";
   const formulier = new FormData(event.currentTarget);
   try {
-    const redirectUrl = encodeURIComponent(SITE_URL);
-    const response = await fetch(`${SUPABASE_URL}/auth/v1/signup?redirect_to=${redirectUrl}`, {
+    const gebruikersnaam = normaliseerGebruikersnaam(formulier.get("gebruikersnaam"));
+    if (!isGeldigeGebruikersnaam(gebruikersnaam)) throw new Error("invalid username");
+    const password = formulier.get("password");
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/register-username`, {
       method: "POST",
       headers: basisHeaders(),
       body: JSON.stringify({
-        email: formulier.get("email"),
-        password: formulier.get("password"),
-        data: { weergavenaam: String(formulier.get("weergavenaam")).trim() },
+        username: gebruikersnaam,
+        password,
       }),
     });
-    const resultaat = await leesJson(response);
-    if (resultaat.access_token) {
-      bewaarSessie(resultaat);
-      await laadPersoonlijkeGegevens();
-      werkAccountweergaveBij();
-      elementen.dialoog.close();
-      await toonVolgendeGrap();
-    } else {
-      kiesAuthTab("login");
-      elementen.authStatus.textContent =
-        "Account gemaakt. Open de bevestigingsmail en klik op de link om in te loggen.";
-    }
+    await leesJson(response);
+    const loginResponse = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+      method: "POST",
+      headers: basisHeaders(),
+      body: JSON.stringify({ email: internAccountadres(gebruikersnaam), password }),
+    });
+    bewaarSessie(await leesJson(loginResponse));
+    await laadPersoonlijkeGegevens();
+    werkAccountweergaveBij();
+    elementen.dialoog.close();
+    await toonVolgendeGrap();
     event.currentTarget.reset();
   } catch (error) {
     elementen.authStatus.textContent = vertaalAuthFout(error);

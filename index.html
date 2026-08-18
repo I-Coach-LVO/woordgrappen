@@ -39,13 +39,13 @@
         <button id="tab-registratie" class="tab" type="button" role="tab" aria-selected="false">Account maken</button>
       </div>
       <form id="login-formulier">
-        <label>E-mailadres<input name="email" type="email" autocomplete="email" required /></label>
+        <label>Gebruikersnaam<input name="gebruikersnaam" type="text" autocomplete="username" inputmode="text" pattern="[a-z0-9._-]{3,24}" minlength="3" maxlength="24" required /></label>
         <label>Wachtwoord<input name="password" type="password" autocomplete="current-password" minlength="8" required /></label>
         <button class="primair breed" type="submit">Inloggen</button>
       </form>
       <form id="registratie-formulier" hidden>
-        <label>Jouw naam<input name="weergavenaam" type="text" autocomplete="name" minlength="2" maxlength="40" required /></label>
-        <label>E-mailadres<input name="email" type="email" autocomplete="email" required /></label>
+        <label>Gebruikersnaam<input name="gebruikersnaam" type="text" autocomplete="username" inputmode="text" pattern="[a-z0-9._-]{3,24}" minlength="3" maxlength="24" required /></label>
+        <p class="auth-uitleg">3–24 kleine letters, cijfers, punten, streepjes of underscores.</p>
         <label>Kies een wachtwoord<input name="password" type="password" autocomplete="new-password" minlength="8" required /></label>
         <button class="primair breed" type="submit">Account maken</button>
       </form>
