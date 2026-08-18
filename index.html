@@ -3,22 +3,54 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Een willekeurige Nederlandse woordgrap, rechtstreeks uit Supabase." />
+    <meta name="description" content="Willekeurige Nederlandse woordgrappen met een persoonlijke kijkhistorie." />
     <title>Woordgrappen</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <header class="gebruikersbalk" aria-label="Gebruikersaccount">
+      <p id="welkom" hidden></p>
+      <button id="inloggen" class="secundair compact" type="button">Inloggen</button>
+      <button id="uitloggen" class="tekstknop" type="button" hidden>Uitloggen</button>
+    </header>
+
     <main class="kaart" aria-labelledby="titel">
       <p class="label">WOORDGRAP VAN HET MOMENT</p>
       <h1 id="titel">Even lachen.</h1>
       <div class="scheiding" aria-hidden="true"></div>
       <p id="grap" class="grap" aria-live="polite">Een verse grap wordt opgehaald…</p>
-      <button id="volgende" type="button" disabled>
-        <span>Nog eentje</span>
-        <span aria-hidden="true">→</span>
-      </button>
+      <div class="acties">
+        <button id="volgende" class="primair" type="button" disabled>
+          <span>Nog eentje</span>
+          <span aria-hidden="true">→</span>
+        </button>
+        <p id="statistiek" class="statistiek" hidden></p>
+      </div>
       <p id="status" class="status" role="status"></p>
     </main>
+
+    <dialog id="auth-dialoog" aria-labelledby="auth-titel">
+      <button id="sluit-auth" class="sluiten" type="button" aria-label="Sluiten">×</button>
+      <p class="label">JOUW WOORDGRAPPEN</p>
+      <h2 id="auth-titel">Welkom terug.</h2>
+      <p id="auth-uitleg" class="auth-uitleg">Log in om bij te houden welke grappen je al hebt gezien.</p>
+      <div class="tabs" role="tablist" aria-label="Account">
+        <button id="tab-login" class="tab actief" type="button" role="tab" aria-selected="true">Inloggen</button>
+        <button id="tab-registratie" class="tab" type="button" role="tab" aria-selected="false">Account maken</button>
+      </div>
+      <form id="login-formulier">
+        <label>E-mailadres<input name="email" type="email" autocomplete="email" required /></label>
+        <label>Wachtwoord<input name="password" type="password" autocomplete="current-password" minlength="8" required /></label>
+        <button class="primair breed" type="submit">Inloggen</button>
+      </form>
+      <form id="registratie-formulier" hidden>
+        <label>Jouw naam<input name="weergavenaam" type="text" autocomplete="name" minlength="2" maxlength="40" required /></label>
+        <label>E-mailadres<input name="email" type="email" autocomplete="email" required /></label>
+        <label>Kies een wachtwoord<input name="password" type="password" autocomplete="new-password" minlength="8" required /></label>
+        <button class="primair breed" type="submit">Account maken</button>
+      </form>
+      <p id="auth-status" class="status" role="status"></p>
+    </dialog>
 
     <script src="app.js"></script>
   </body>
