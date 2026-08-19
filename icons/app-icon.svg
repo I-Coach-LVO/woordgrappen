@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">Mop van de dag</title>
+  <rect width="512" height="512" rx="96" fill="#f4ecd8"/>
+  <rect x="102" y="110" width="332" height="306" rx="54" fill="#17241f"/>
+  <rect x="78" y="86" width="332" height="306" rx="54" fill="#fffdf6" stroke="#17241f" stroke-width="16"/>
+  <circle cx="244" cy="238" r="103" fill="#b33a4b"/>
+  <path d="M181 211c0-31 18-51 49-58v32c-14 6-21 16-22 29h25v62h-52v-65zm76 0c0-31 18-51 49-58v32c-14 6-21 16-22 29h25v62h-52v-65z" fill="#fffdf6"/>
+  <rect x="125" y="328" width="126" height="12" rx="6" fill="#e9b93f"/>
+</svg>
