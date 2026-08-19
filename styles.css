@@ -210,6 +210,38 @@ input {
   font: inherit;
 }
 
+.installatiemelding {
+  position: fixed;
+  z-index: 4;
+  right: 16px;
+  bottom: 16px;
+  width: min(420px, calc(100% - 32px));
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 48px 16px 18px;
+  border: 2px solid #17241f;
+  border-radius: 18px;
+  background: #fffdf6;
+  box-shadow: 6px 6px 0 #17241f;
+}
+
+.installatiemelding[hidden] { display: none; }
+.installatiemelding strong { display: block; margin-bottom: 5px; }
+.installatiemelding p { margin: 0; color: #496159; font-size: 0.88rem; line-height: 1.4; }
+
+.installatie-sluiten {
+  position: absolute;
+  top: 6px;
+  right: 9px;
+  padding: 5px 8px;
+  background: transparent;
+  color: #17241f;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
 @media (max-width: 520px) {
   body { padding: 80px 16px 24px; }
   .gebruikersbalk { top: 14px; right: 16px; }
@@ -219,6 +251,14 @@ input {
     box-shadow: 7px 7px 0 #17241f;
   }
   .acties { align-items: flex-start; flex-direction: column; }
+  .installatiemelding {
+    grid-template-columns: 1fr;
+    right: 12px;
+    bottom: 12px;
+    width: calc(100% - 24px);
+    padding: 14px 42px 14px 15px;
+  }
+  .installatiemelding .secundair { justify-self: start; }
 }
 
 @media (prefers-reduced-motion: reduce) {

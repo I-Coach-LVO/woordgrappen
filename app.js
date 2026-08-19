@@ -2,6 +2,7 @@ const SUPABASE_URL = "https://ylskdwvtxuionyuzuyfs.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_Xj_RHfxvs358TdjWjqlQwA_PgRhV-6k";
 const SESSIE_SLEUTEL = "woordgrappen-sessie";
 const INTERN_ACCOUNT_DOMEIN = "accounts.woordgrappen.invalid";
+const INSTALLATIEMELDING_SLEUTEL = "woordgrappen-installatiemelding-gesloten";
 
 const elementen = {
   grap: document.querySelector("#grap"),
@@ -20,6 +21,10 @@ const elementen = {
   tabRegistratie: document.querySelector("#tab-registratie"),
   loginFormulier: document.querySelector("#login-formulier"),
   registratieFormulier: document.querySelector("#registratie-formulier"),
+  installatiemelding: document.querySelector("#installatiemelding"),
+  installatieUitleg: document.querySelector("#installatie-uitleg"),
+  sluitInstallatie: document.querySelector("#sluit-installatie"),
+  installeerApp: document.querySelector("#installeer-app"),
 };
 
 let woordgrappen = [];
@@ -27,6 +32,60 @@ let huidigeGrap = null;
 let sessie = null;
 let profiel = null;
 let weergaveTellingen = new Map();
+let installatiePrompt = null;
+
+function draaitAlsApp() {
+  return window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+}
+
+function isMobielApparaat() {
+  return /Android|iPhone|iPod/i.test(navigator.userAgent) ||
+    (/Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+}
+
+function isAppleMobiel() {
+  return /iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+    (/Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+}
+
+function installatiemeldingGesloten() {
+  return localStorage.getItem(INSTALLATIEMELDING_SLEUTEL) === "ja";
+}
+
+function verbergInstallatiemelding(onthouden = false) {
+  elementen.installatiemelding.hidden = true;
+  if (onthouden) localStorage.setItem(INSTALLATIEMELDING_SLEUTEL, "ja");
+}
+
+function toonInstallatiemelding() {
+  if (!isMobielApparaat() || draaitAlsApp() || installatiemeldingGesloten()) return;
+
+  if (isAppleMobiel()) {
+    elementen.installatieUitleg.textContent =
+      "Open deze pagina in Safari, tik op Delen en kies ‘Zet op beginscherm’.";
+    elementen.installeerApp.hidden = true;
+  } else if (installatiePrompt) {
+    elementen.installatieUitleg.textContent =
+      "Installeer deze webapp en open hem voortaan direct vanaf je beginscherm.";
+    elementen.installeerApp.hidden = false;
+  } else {
+    elementen.installatieUitleg.textContent =
+      "Open het Chrome-menu (⋮) en kies ‘App installeren’ of ‘Toevoegen aan startscherm’.";
+    elementen.installeerApp.hidden = true;
+  }
+  elementen.installatiemelding.hidden = false;
+}
+
+window.addEventListener("beforeinstallprompt", (event) => {
+  event.preventDefault();
+  installatiePrompt = event;
+  toonInstallatiemelding();
+});
+
+window.addEventListener("appinstalled", () => {
+  installatiePrompt = null;
+  verbergInstallatiemelding(true);
+});
 
 function basisHeaders() {
   return { apikey: SUPABASE_PUBLISHABLE_KEY, "Content-Type": "application/json" };
@@ -339,5 +398,14 @@ elementen.registratieFormulier.addEventListener("submit", verwerkRegistratie);
 elementen.dialoog.addEventListener("click", (event) => {
   if (event.target === elementen.dialoog) elementen.dialoog.close();
 });
+elementen.sluitInstallatie.addEventListener("click", () => verbergInstallatiemelding(true));
+elementen.installeerApp.addEventListener("click", async () => {
+  if (!installatiePrompt) return;
+  await installatiePrompt.prompt();
+  await installatiePrompt.userChoice;
+  installatiePrompt = null;
+  verbergInstallatiemelding(true);
+});
 
 start();
+window.setTimeout(toonInstallatiemelding, 900);

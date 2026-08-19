@@ -4,7 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Willekeurige Nederlandse woordgrappen met een persoonlijke kijkhistorie." />
-    <title>Woordgrappen</title>
+    <meta name="theme-color" content="#B33A4B" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Mop van de dag" />
+    <title>Mop van de dag</title>
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/icon-192.png" type="image/png" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -28,6 +35,15 @@
       </div>
       <p id="status" class="status" role="status"></p>
     </main>
+
+    <aside id="installatiemelding" class="installatiemelding" aria-labelledby="installatie-titel" hidden>
+      <button id="sluit-installatie" class="installatie-sluiten" type="button" aria-label="Installatiemelding sluiten">×</button>
+      <div>
+        <strong id="installatie-titel">Zet Mop van de dag op je beginscherm</strong>
+        <p id="installatie-uitleg"></p>
+      </div>
+      <button id="installeer-app" class="secundair compact" type="button" hidden>App installeren</button>
+    </aside>
 
     <dialog id="auth-dialoog" aria-labelledby="auth-titel">
       <button id="sluit-auth" class="sluiten" type="button" aria-label="Sluiten">×</button>
