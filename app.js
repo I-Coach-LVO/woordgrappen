@@ -185,7 +185,9 @@ async function herstelSessie() {
     if (Number(sessie.expires_at) <= Math.floor(Date.now() / 1000) + 60) {
       await verversSessie();
     }
-    if (!sessie.user) await haalGebruikerOp();
+    // Controleer de gebruiker altijd opnieuw. Een lokaal bewaarde sessie kan nog
+    // naar een account wijzen dat inmiddels in Supabase is verwijderd.
+    await haalGebruikerOp();
     await laadPersoonlijkeGegevens();
   } catch (error) {
     console.error(error);
@@ -205,10 +207,8 @@ async function laadPersoonlijkeGegevens() {
   ]);
   const profielen = await leesJson(profielResponse);
   const weergaven = await leesJson(weergavenResponse);
-  profiel = profielen[0] || {
-    weergavenaam: "grappenliefhebber",
-    mag_moppen_verwijderen: false,
-  };
+  if (!profielen[0]) throw new Error("Profiel niet gevonden.");
+  profiel = profielen[0];
   weergaveTellingen = new Map();
   for (const { grap_id: grapId } of weergaven) {
     weergaveTellingen.set(grapId, (weergaveTellingen.get(grapId) || 0) + 1);
