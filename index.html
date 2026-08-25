@@ -37,6 +37,34 @@
         <p id="statistiek" class="statistiek" hidden></p>
       </div>
       <p id="status" class="status" role="status"></p>
+
+      <section id="ai-generator" class="ai-generator" aria-labelledby="ai-titel" hidden>
+        <p class="label">ALLEEN VOOR BEHEERDERS</p>
+        <h2 id="ai-titel" class="ai-titel">Nieuwe mop met AI</h2>
+        <p id="ai-uitleg" class="ai-uitleg">
+          Geef een onderwerp op. De nieuwe woordgrap wordt direct voor iedereen toegevoegd.
+        </p>
+        <form id="ai-formulier" class="ai-formulier">
+          <label>
+            Onderwerp
+            <input
+              id="ai-onderwerp"
+              name="onderwerp"
+              type="text"
+              minlength="2"
+              maxlength="80"
+              autocomplete="off"
+              aria-describedby="ai-uitleg"
+              placeholder="Bijvoorbeeld: fietsen"
+              required
+            />
+          </label>
+          <button id="ai-maak-grap" class="secundair compact" type="submit">
+            Maak woordgrap
+          </button>
+        </form>
+        <p id="ai-status" class="status" role="status"></p>
+      </section>
     </main>
 
     <aside id="installatiemelding" class="installatiemelding" aria-labelledby="installatie-titel" hidden>

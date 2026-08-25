@@ -22,6 +22,11 @@ const elementen = {
   tabRegistratie: document.querySelector("#tab-registratie"),
   loginFormulier: document.querySelector("#login-formulier"),
   registratieFormulier: document.querySelector("#registratie-formulier"),
+  aiGenerator: document.querySelector("#ai-generator"),
+  aiFormulier: document.querySelector("#ai-formulier"),
+  aiOnderwerp: document.querySelector("#ai-onderwerp"),
+  aiMaakGrap: document.querySelector("#ai-maak-grap"),
+  aiStatus: document.querySelector("#ai-status"),
   installatiemelding: document.querySelector("#installatiemelding"),
   installatieUitleg: document.querySelector("#installatie-uitleg"),
   sluitInstallatie: document.querySelector("#sluit-installatie"),
@@ -314,6 +319,48 @@ async function verwijderHuidigeGrap() {
   }
 }
 
+async function genereerWoordgrap(event) {
+  event.preventDefault();
+  if (!magMoppenVerwijderen()) return;
+
+  const onderwerp = elementen.aiOnderwerp.value.trim();
+  if (onderwerp.length < 2 || onderwerp.length > 80) {
+    elementen.aiStatus.textContent = "Vul een onderwerp van 2 tot 80 tekens in.";
+    return;
+  }
+
+  elementen.aiMaakGrap.disabled = true;
+  elementen.aiStatus.textContent = "AI verzint een verse woordgrap…";
+  try {
+    const response = await fetch(`${SUPABASE_URL}/functions/v1/genereer-woordgrap`, {
+      method: "POST",
+      headers: ingelogdeHeaders(),
+      body: JSON.stringify({ onderwerp }),
+    });
+    const resultaat = await leesJson(response);
+    const nieuweGrap = resultaat?.grap;
+    if (!nieuweGrap?.id || !nieuweGrap?.grap) {
+      throw new Error("De AI gaf geen geldige woordgrap terug.");
+    }
+
+    if (!woordgrappen.some(({ id }) => id === nieuweGrap.id)) {
+      woordgrappen.push(nieuweGrap);
+    }
+    huidigeGrap = nieuweGrap;
+    elementen.grap.textContent = nieuweGrap.grap;
+    await registreerWeergave(nieuweGrap.id);
+    werkStatistiekBij();
+    werkVerwijderknopBij();
+    elementen.aiFormulier.reset();
+    elementen.aiStatus.textContent = "De nieuwe woordgrap staat in de database en is voor iedereen zichtbaar.";
+  } catch (error) {
+    elementen.aiStatus.textContent = error.message || "De woordgrap kon niet worden gemaakt.";
+    console.error(error);
+  } finally {
+    elementen.aiMaakGrap.disabled = false;
+  }
+}
+
 function werkAccountweergaveBij() {
   const ingelogd = Boolean(sessie?.user);
   elementen.inloggen.hidden = ingelogd;
@@ -322,6 +369,8 @@ function werkAccountweergaveBij() {
   elementen.welkom.textContent = ingelogd
     ? `Hoi, ${profiel?.weergavenaam || "grappenliefhebber"}!`
     : "";
+  elementen.aiGenerator.hidden = !magMoppenVerwijderen();
+  if (elementen.aiGenerator.hidden) elementen.aiStatus.textContent = "";
   werkVerwijderknopBij();
   werkStatistiekBij();
 }
@@ -456,6 +505,7 @@ elementen.tabLogin.addEventListener("click", () => kiesAuthTab("login"));
 elementen.tabRegistratie.addEventListener("click", () => kiesAuthTab("registratie"));
 elementen.loginFormulier.addEventListener("submit", verwerkLogin);
 elementen.registratieFormulier.addEventListener("submit", verwerkRegistratie);
+elementen.aiFormulier.addEventListener("submit", genereerWoordgrap);
 elementen.dialoog.addEventListener("click", (event) => {
   if (event.target === elementen.dialoog) elementen.dialoog.close();
 });
