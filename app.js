@@ -8,6 +8,7 @@ const elementen = {
   grap: document.querySelector("#grap"),
   status: document.querySelector("#status"),
   volgende: document.querySelector("#volgende"),
+  verwijderGrap: document.querySelector("#verwijder-grap"),
   statistiek: document.querySelector("#statistiek"),
   welkom: document.querySelector("#welkom"),
   inloggen: document.querySelector("#inloggen"),
@@ -133,6 +134,14 @@ function verwijderSessie() {
   localStorage.removeItem(SESSIE_SLEUTEL);
 }
 
+function magMoppenVerwijderen() {
+  return Boolean(sessie?.user && profiel?.mag_moppen_verwijderen);
+}
+
+function werkVerwijderknopBij() {
+  elementen.verwijderGrap.hidden = !magMoppenVerwijderen() || !huidigeGrap;
+}
+
 async function haalGebruikerOp() {
   const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
     headers: ingelogdeHeaders(),
@@ -187,7 +196,7 @@ async function herstelSessie() {
 async function laadPersoonlijkeGegevens() {
   const [profielResponse, weergavenResponse] = await Promise.all([
     fetch(
-      `${SUPABASE_URL}/rest/v1/profielen?select=weergavenaam&id=eq.${encodeURIComponent(sessie.user.id)}`,
+      `${SUPABASE_URL}/rest/v1/profielen?select=weergavenaam%2Cmag_moppen_verwijderen&id=eq.${encodeURIComponent(sessie.user.id)}`,
       { headers: ingelogdeHeaders() },
     ),
     fetch(`${SUPABASE_URL}/rest/v1/grap_weergaven?select=grap_id`, {
@@ -196,7 +205,10 @@ async function laadPersoonlijkeGegevens() {
   ]);
   const profielen = await leesJson(profielResponse);
   const weergaven = await leesJson(weergavenResponse);
-  profiel = profielen[0] || { weergavenaam: "grappenliefhebber" };
+  profiel = profielen[0] || {
+    weergavenaam: "grappenliefhebber",
+    mag_moppen_verwijderen: false,
+  };
   weergaveTellingen = new Map();
   for (const { grap_id: grapId } of weergaven) {
     weergaveTellingen.set(grapId, (weergaveTellingen.get(grapId) || 0) + 1);
@@ -241,17 +253,64 @@ function werkStatistiekBij() {
 
 async function toonVolgendeGrap() {
   elementen.volgende.disabled = true;
+  elementen.verwijderGrap.disabled = true;
   elementen.status.textContent = "";
   try {
     huidigeGrap = kiesWillekeurigeGrap();
     elementen.grap.textContent = huidigeGrap.grap;
     await registreerWeergave(huidigeGrap.id);
     werkStatistiekBij();
+    werkVerwijderknopBij();
   } catch (error) {
     elementen.status.textContent = "De grap verscheen, maar je kijkhistorie kon niet worden bijgewerkt.";
     console.error(error);
   } finally {
     elementen.volgende.disabled = false;
+    elementen.verwijderGrap.disabled = false;
+  }
+}
+
+async function verwijderHuidigeGrap() {
+  if (!magMoppenVerwijderen() || !huidigeGrap) return;
+  if (woordgrappen.length <= 1) {
+    elementen.status.textContent = "De laatste mop kan niet worden verwijderd.";
+    return;
+  }
+
+  const grapOmTeVerwijderen = huidigeGrap;
+  const bevestigd = window.confirm(
+    `Weet je zeker dat je deze mop permanent wilt verwijderen?\n\n“${grapOmTeVerwijderen.grap}”`,
+  );
+  if (!bevestigd) return;
+
+  elementen.volgende.disabled = true;
+  elementen.verwijderGrap.disabled = true;
+  elementen.status.textContent = "Mop wordt verwijderd…";
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/woordgrappen?id=eq.${encodeURIComponent(grapOmTeVerwijderen.id)}`,
+      {
+        method: "DELETE",
+        headers: { ...ingelogdeHeaders(), Prefer: "return=representation" },
+      },
+    );
+    const verwijderdeGrappen = await leesJson(response);
+    if (!Array.isArray(verwijderdeGrappen) || verwijderdeGrappen.length !== 1) {
+      throw new Error("Deze account heeft geen verwijderrecht.");
+    }
+
+    woordgrappen = woordgrappen.filter(({ id }) => id !== grapOmTeVerwijderen.id);
+    weergaveTellingen.delete(grapOmTeVerwijderen.id);
+    huidigeGrap = null;
+    await toonVolgendeGrap();
+    elementen.status.textContent = "De mop is permanent verwijderd.";
+  } catch (error) {
+    elementen.status.textContent = "De mop kon niet worden verwijderd.";
+    console.error(error);
+  } finally {
+    elementen.volgende.disabled = false;
+    elementen.verwijderGrap.disabled = false;
+    werkVerwijderknopBij();
   }
 }
 
@@ -263,6 +322,7 @@ function werkAccountweergaveBij() {
   elementen.welkom.textContent = ingelogd
     ? `Hoi, ${profiel?.weergavenaam || "grappenliefhebber"}!`
     : "";
+  werkVerwijderknopBij();
   werkStatistiekBij();
 }
 
@@ -385,6 +445,7 @@ async function start() {
 }
 
 elementen.volgende.addEventListener("click", toonVolgendeGrap);
+elementen.verwijderGrap.addEventListener("click", verwijderHuidigeGrap);
 elementen.inloggen.addEventListener("click", () => {
   kiesAuthTab("login");
   elementen.dialoog.showModal();
