@@ -221,15 +221,7 @@ async function laadPersoonlijkeGegevens() {
 }
 
 function kiesWillekeurigeGrap() {
-  let kandidaten = woordgrappen.filter(({ id }) => id !== huidigeGrap?.id);
-  if (sessie) {
-    const laagsteAantal = Math.min(
-      ...kandidaten.map(({ id }) => weergaveTellingen.get(id) || 0),
-    );
-    kandidaten = kandidaten.filter(
-      ({ id }) => (weergaveTellingen.get(id) || 0) === laagsteAantal,
-    );
-  }
+  const kandidaten = woordgrappen.filter(({ id }) => id !== huidigeGrap?.id);
   return kandidaten[Math.floor(Math.random() * kandidaten.length)];
 }
 
