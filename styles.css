@@ -53,7 +53,7 @@ body {
   letter-spacing: 0.14em;
 }
 
-h1, h2 {
+h1, h2, h3 {
   margin: 0;
   font-family: Georgia, "Times New Roman", serif;
   letter-spacing: -0.045em;
@@ -61,6 +61,7 @@ h1, h2 {
 
 h1 { font-size: clamp(2.5rem, 8vw, 5.25rem); line-height: 0.95; }
 h2 { font-size: clamp(2rem, 6vw, 3.25rem); }
+h3 { font-size: 1.25rem; }
 
 .scheiding {
   width: 72px;
@@ -114,7 +115,7 @@ button { border: 0; font: inherit; cursor: pointer; }
   box-shadow: 2px 2px 0 #17241f;
 }
 
-button:focus-visible, input:focus-visible {
+button:focus-visible, input:focus-visible, textarea:focus-visible {
   outline: 4px solid #e9b93f;
   outline-offset: 3px;
 }
@@ -169,6 +170,14 @@ button:disabled { cursor: wait; opacity: 0.55; }
 .ai-formulier { gap: 12px; }
 .ai-formulier .secundair { justify-self: start; }
 .ai-generator .status { margin-bottom: 0; }
+
+.handmatig-toevoegen {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 2px solid #d8cdb5;
+}
+
+.handmatig-toevoegen h3 { margin: 0; }
 
 dialog {
   width: min(500px, calc(100% - 32px));
@@ -227,7 +236,7 @@ label {
   text-transform: uppercase;
 }
 
-input {
+input, textarea {
   width: 100%;
   padding: 13px 14px;
   border: 2px solid #8b9b95;
@@ -236,6 +245,8 @@ input {
   color: #17241f;
   font: inherit;
 }
+
+textarea { resize: vertical; line-height: 1.45; }
 
 .installatiemelding {
   position: fixed;

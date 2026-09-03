@@ -12,6 +12,8 @@ De website bevat een PWA-manifest en appiconen, zodat hij als **Mop van de dag**
 
 Alleen expliciet aangewezen accounts kunnen een onderwerp invoeren en via OpenRouter een nieuwe woordgrap laten maken met GPT-5 mini. Het recht om moppen toe te voegen staat los van het recht om ze te verwijderen. Beide controles vinden zowel in de Supabase Edge Function als via Row Level Security plaats. Nieuwe grappen komen in `public.woordgrappen` en zijn daarna voor iedereen zichtbaar.
 
+Accounts met toevoegrecht kunnen daarnaast zelf een volledige mop typen en rechtstreeks opslaan. Ook deze handmatige invoer gebruikt de ingelogde sessie en dezelfde Row Level Security-regel.
+
 Zet voor lokaal gebruik de volgende waarden in `.env.local`:
 
 ```text

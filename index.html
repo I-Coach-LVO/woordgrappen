@@ -64,6 +64,31 @@
           </button>
         </form>
         <p id="ai-status" class="status" role="status"></p>
+
+        <div class="handmatig-toevoegen">
+          <h3>Zelf een mop toevoegen</h3>
+          <p id="handmatig-uitleg" class="ai-uitleg">
+            Typ de volledige mop. Na het opslaan is hij direct voor iedereen zichtbaar.
+          </p>
+          <form id="handmatig-formulier" class="ai-formulier">
+            <label>
+              Nieuwe mop
+              <textarea
+                id="handmatige-grap"
+                name="grap"
+                minlength="10"
+                maxlength="280"
+                rows="4"
+                aria-describedby="handmatig-uitleg"
+                required
+              ></textarea>
+            </label>
+            <button id="handmatig-opslaan" class="secundair compact" type="submit">
+              Mop opslaan
+            </button>
+          </form>
+          <p id="handmatig-status" class="status" role="status"></p>
+        </div>
       </section>
     </main>
 

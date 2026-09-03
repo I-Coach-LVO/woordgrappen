@@ -27,6 +27,10 @@ const elementen = {
   aiOnderwerp: document.querySelector("#ai-onderwerp"),
   aiMaakGrap: document.querySelector("#ai-maak-grap"),
   aiStatus: document.querySelector("#ai-status"),
+  handmatigFormulier: document.querySelector("#handmatig-formulier"),
+  handmatigeGrap: document.querySelector("#handmatige-grap"),
+  handmatigOpslaan: document.querySelector("#handmatig-opslaan"),
+  handmatigStatus: document.querySelector("#handmatig-status"),
   installatiemelding: document.querySelector("#installatiemelding"),
   installatieUitleg: document.querySelector("#installatie-uitleg"),
   sluitInstallatie: document.querySelector("#sluit-installatie"),
@@ -357,6 +361,52 @@ async function genereerWoordgrap(event) {
   }
 }
 
+async function voegHandmatigeGrapToe(event) {
+  event.preventDefault();
+  if (!magMoppenToevoegen()) return;
+
+  const grap = elementen.handmatigeGrap.value.trim().replace(/\s+/g, " ");
+  if (grap.length < 10 || grap.length > 280) {
+    elementen.handmatigStatus.textContent = "Typ een mop van 10 tot 280 tekens.";
+    return;
+  }
+
+  elementen.handmatigOpslaan.disabled = true;
+  elementen.handmatigStatus.textContent = "Mop wordt opgeslagen…";
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/woordgrappen`, {
+      method: "POST",
+      headers: { ...ingelogdeHeaders(), Prefer: "return=representation" },
+      body: JSON.stringify({ grap }),
+    });
+    const opgeslagen = await leesJson(response);
+    const nieuweGrap = opgeslagen?.[0];
+    if (!nieuweGrap?.id || !nieuweGrap?.grap) {
+      throw new Error("De database gaf geen opgeslagen mop terug.");
+    }
+
+    woordgrappen.push(nieuweGrap);
+    huidigeGrap = nieuweGrap;
+    elementen.grap.textContent = nieuweGrap.grap;
+    elementen.handmatigFormulier.reset();
+    elementen.handmatigStatus.textContent = "De mop staat in de database en is voor iedereen zichtbaar.";
+    try {
+      await registreerWeergave(nieuweGrap.id);
+    } catch (error) {
+      elementen.handmatigStatus.textContent =
+        "De mop is opgeslagen, maar je kijkhistorie kon niet worden bijgewerkt.";
+      console.error(error);
+    }
+    werkStatistiekBij();
+    werkVerwijderknopBij();
+  } catch (error) {
+    elementen.handmatigStatus.textContent = "De mop kon niet worden opgeslagen. Mogelijk bestaat hij al.";
+    console.error(error);
+  } finally {
+    elementen.handmatigOpslaan.disabled = false;
+  }
+}
+
 function werkAccountweergaveBij() {
   const ingelogd = Boolean(sessie?.user);
   elementen.inloggen.hidden = ingelogd;
@@ -366,7 +416,10 @@ function werkAccountweergaveBij() {
     ? `Hoi, ${profiel?.weergavenaam || "grappenliefhebber"}!`
     : "";
   elementen.aiGenerator.hidden = !magMoppenToevoegen();
-  if (elementen.aiGenerator.hidden) elementen.aiStatus.textContent = "";
+  if (elementen.aiGenerator.hidden) {
+    elementen.aiStatus.textContent = "";
+    elementen.handmatigStatus.textContent = "";
+  }
   werkVerwijderknopBij();
   werkStatistiekBij();
 }
@@ -502,6 +555,7 @@ elementen.tabRegistratie.addEventListener("click", () => kiesAuthTab("registrati
 elementen.loginFormulier.addEventListener("submit", verwerkLogin);
 elementen.registratieFormulier.addEventListener("submit", verwerkRegistratie);
 elementen.aiFormulier.addEventListener("submit", genereerWoordgrap);
+elementen.handmatigFormulier.addEventListener("submit", voegHandmatigeGrapToe);
 elementen.dialoog.addEventListener("click", (event) => {
   if (event.target === elementen.dialoog) elementen.dialoog.close();
 });
