@@ -10,13 +10,13 @@ De website bevat een PWA-manifest en appiconen, zodat hij als **Mop van de dag**
 
 ## AI-woordgrappen
 
-Alleen de expliciet aangewezen beheerders kunnen een onderwerp invoeren en via OpenRouter een nieuwe woordgrap laten maken met Mistral Nemo. De controle vindt zowel in de Supabase Edge Function als via Row Level Security plaats. Nieuwe grappen komen in `public.woordgrappen` en zijn daarna voor iedereen zichtbaar.
+Alleen expliciet aangewezen accounts kunnen een onderwerp invoeren en via OpenRouter een nieuwe woordgrap laten maken met GPT-5 mini. Het recht om moppen toe te voegen staat los van het recht om ze te verwijderen. Beide controles vinden zowel in de Supabase Edge Function als via Row Level Security plaats. Nieuwe grappen komen in `public.woordgrappen` en zijn daarna voor iedereen zichtbaar.
 
 Zet voor lokaal gebruik de volgende waarden in `.env.local`:
 
 ```text
 OPENROUTER_API_KEY=
-OPENROUTER_MODEL=mistralai/mistral-nemo
+OPENROUTER_MODEL=openai/gpt-5-mini
 ```
 
 `.env.local` wordt door Git genegeerd. Voor de live Edge Function moeten dezelfde waarden handmatig worden toegevoegd via **Supabase → Edge Functions → Secrets**. Zet de sleutel nooit in `app.js`, GitHub of andere openbare code.
