@@ -66,7 +66,7 @@ Deno.serve(async (request: Request) => {
   }
 
   const profielResponse = await fetch(
-    `${supabaseUrl}/rest/v1/profielen?select=id%2Cmag_moppen_verwijderen&id=eq.${encodeURIComponent(gebruiker.id)}`,
+    `${supabaseUrl}/rest/v1/profielen?select=id%2Cmag_moppen_toevoegen&id=eq.${encodeURIComponent(gebruiker.id)}`,
     { headers: gebruikersHeaders },
   );
   if (!profielResponse.ok) {
@@ -74,9 +74,9 @@ Deno.serve(async (request: Request) => {
   }
   const profielen = await leesJson(profielResponse) as Array<{
     id: string;
-    mag_moppen_verwijderen: boolean;
+    mag_moppen_toevoegen: boolean;
   }>;
-  if (!profielen[0]?.mag_moppen_verwijderen) {
+  if (!profielen[0]?.mag_moppen_toevoegen) {
     return antwoord(403, { message: "Dit account mag geen woordgrappen toevoegen." }, origin);
   }
 

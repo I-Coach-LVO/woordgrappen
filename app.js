@@ -143,6 +143,10 @@ function magMoppenVerwijderen() {
   return Boolean(sessie?.user && profiel?.mag_moppen_verwijderen);
 }
 
+function magMoppenToevoegen() {
+  return Boolean(sessie?.user && profiel?.mag_moppen_toevoegen);
+}
+
 function werkVerwijderknopBij() {
   elementen.verwijderGrap.hidden = !magMoppenVerwijderen() || !huidigeGrap;
 }
@@ -203,7 +207,7 @@ async function herstelSessie() {
 async function laadPersoonlijkeGegevens() {
   const [profielResponse, weergavenResponse] = await Promise.all([
     fetch(
-      `${SUPABASE_URL}/rest/v1/profielen?select=weergavenaam%2Cmag_moppen_verwijderen&id=eq.${encodeURIComponent(sessie.user.id)}`,
+      `${SUPABASE_URL}/rest/v1/profielen?select=weergavenaam%2Cmag_moppen_verwijderen%2Cmag_moppen_toevoegen&id=eq.${encodeURIComponent(sessie.user.id)}`,
       { headers: ingelogdeHeaders() },
     ),
     fetch(`${SUPABASE_URL}/rest/v1/grap_weergaven?select=grap_id`, {
@@ -313,7 +317,7 @@ async function verwijderHuidigeGrap() {
 
 async function genereerWoordgrap(event) {
   event.preventDefault();
-  if (!magMoppenVerwijderen()) return;
+  if (!magMoppenToevoegen()) return;
 
   const onderwerp = elementen.aiOnderwerp.value.trim();
   if (onderwerp.length < 2 || onderwerp.length > 80) {
@@ -361,7 +365,7 @@ function werkAccountweergaveBij() {
   elementen.welkom.textContent = ingelogd
     ? `Hoi, ${profiel?.weergavenaam || "grappenliefhebber"}!`
     : "";
-  elementen.aiGenerator.hidden = !magMoppenVerwijderen();
+  elementen.aiGenerator.hidden = !magMoppenToevoegen();
   if (elementen.aiGenerator.hidden) elementen.aiStatus.textContent = "";
   werkVerwijderknopBij();
   werkStatistiekBij();
